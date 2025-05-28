@@ -1,5 +1,19 @@
 .App {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.dark {
+  background-color: #282c34;
+  color: white;
+}
+.light {
+  background-color: #f0f0f0;
+  color: black;
 }
 
 .App-logo {
@@ -35,4 +49,136 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.main-container {
+  width: 400px;
+  margin: 0 auto;
+}
+
+main {
+  background-color: white;
+  width: 100%;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+.main-container.dark main {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.todo-input {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+  transition: border-color 0.3s ease;
+}
+
+.main-container.dark .todo-input {
+  border-bottom-color: #4a5568;
+}
+
+select {
+  border: none;
+  margin-right: 10px;
+  font-size: 1em;
+  background-color: transparent;
+  color: inherit;
+}
+
+.todo-input input {
+  border: none;
+  flex-grow: 1;
+  font-size: 1em;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+}
+
+.main-container.dark .todo-input input::placeholder {
+  color: #a0aec0;
+}
+h1 {
+  color: red;
+  font-size: 80px;
+}
+
+p {
+  font-size: 11px;
+}
+.completed {
+  text-decoration: line-through;
+}
+
+.todo-item-title {
+  cursor: pointer;
+}
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.todo-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.todo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 0.9em;
+  color: #777;
+}
+
+.todo-footer .filters {
+  display: flex;
+  gap: 10px;
+}
+
+.todo-footer .filters span {
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.todo-footer .filters span.active {
+  border-color: #e35d6a;
+}
+
+.todo-footer .clear {
+  cursor: pointer;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 15px;
+  color: #777;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin: 10px 0;
 }
