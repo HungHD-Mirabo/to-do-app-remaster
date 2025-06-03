@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Header } from "./components/Header/Header";
 import { Main } from "./components/Main/Main";
 import { Footer } from "./components/Footer/Footer";
 import { useTheme } from "./themeContext";
 import { DataUtilities } from "./DataFake";
+import {
+  addItem,
+  clearCompleted,
+  completeItem,
+  fetchItems,
+  updateItem,
+} from "./apis/to-do.api";
+import { get } from "http";
 
 export interface Item {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+export interface ItemDto {
   title: string;
   completed: boolean;
 }
@@ -20,31 +34,77 @@ export const filterOptions = [
 const data = new DataUtilities();
 
 function App() {
-  const [items, setItems] = useState<Item[]>(data.getItem(1));
+  const [isLoading, setLoading] = useState(false);
+  const [items, setItems] = useState<Item[]>([]);
+
   const [filter, setFilter] = useState(filterOptions[0].value);
 
   const context = useTheme();
   const { darkMode, toggleTheme } = context;
 
+  useEffect(() => {
+    loadItems(0, filter);
+  }, [filter]);
+
+  const loadItems = async (page = 0, filter = "all") => {
+    try {
+      setLoading(true);
+      const res = await fetchItems({ page, filter });
+      setItems(res.data);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFilterChange = (newFilter: string) => {
     setFilter(newFilter);
   };
 
-  const handleClearCompleted = () => {
-    const updatedItems = items.filter((item) => !item.completed);
-    setItems(updatedItems);
+  const handleClearCompleted = async () => {
+    try {
+      setLoading(true);
+      await clearCompleted();
+      setItems((prevItems) => prevItems.filter((item) => !item.completed));
+    } catch (error) {
+      console.error("Error clearing completed items:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddItem = (name: string) => {
-    setItems((prevItems) => [...prevItems, { title: name, completed: false }]);
+  const handleAddItem = async (name: string) => {
+    if (!name.trim()) return;
+    const newItem: ItemDto = { title: name, completed: false };
+    try {
+      await addItem(newItem);
+      loadItems(0, filter);
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
   };
 
-  const handleCompleteItem = (name: string) => {
-    const updatedItems = items.map((item) =>
-      item.title === name ? { ...item, completed: !item.completed } : item
-    );
-    setItems(updatedItems);
+  const handleCompleteItem = async (id: number) => {
+    try {
+      setLoading(true);
+      await completeItem(id);
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id ? { ...item, completed: !item.completed } : item
+        )
+      );
+    } catch (error) {
+      console.error("Error completing item:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const getMoreData = async (page: number) => {
+    const res = await fetchItems({ page, filter });
+    return res.data;
+  }
 
   const handleLoadMore = (newData: Item[]) => {
     console.log("hehe");
@@ -56,6 +116,7 @@ function App() {
 
   return (
     <div className={`App ${darkMode ? "dark" : "light"}`}>
+      {isLoading && <div className="loading">Loading...</div>}
       <header className="header">
         <h1>Todo List</h1>
         <button className="header__theme-toggle" onClick={toggleTheme}>
@@ -67,8 +128,8 @@ function App() {
         items={items}
         filter={filter}
         handleCompleteItem={handleCompleteItem}
-        data={data}
         handleLoadMore={handleLoadMore}
+        getMoreData={getMoreData}
       />
       <Footer
         itemsLeft={items.filter((item) => !item.completed).length}
@@ -86,3 +147,4 @@ function App() {
 }
 
 export default App;
+

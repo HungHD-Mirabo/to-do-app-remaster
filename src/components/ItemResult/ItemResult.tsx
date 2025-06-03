@@ -1,10 +1,11 @@
 interface ItemProps {
   item: {
+    id: number;
     title: string;
     completed: boolean;
   };
   index: number;
-  toggleItem: (name: string) => void;
+  toggleItem: (id: number) => void;
 }
 
 export function ItemResult(props: ItemProps) {
@@ -15,7 +16,7 @@ export function ItemResult(props: ItemProps) {
       <input
         type="checkbox"
         checked={item.completed}
-        onClick={() => toggleItem(item.title)}
+        onClick={() => toggleItem(item.id)}
       />
       <div className={item.completed ? "completed" : ""}>{item.title}</div>
     </li>

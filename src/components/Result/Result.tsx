@@ -6,9 +6,9 @@ import type { WithScrollProps } from "../../withScroll";
 
 interface ResultProps extends WithScrollProps {
   filter: string;
-  toggleItem: (name: string) => void;
+  toggleItem: (id: number) => void;
   items: Item[];
-  getData: (page: number) => Item[];
+  getData: (page: number) => any;
   handleLoadMore: (newData: Item[]) => void;
 }
 function Result(props: ResultProps) {
