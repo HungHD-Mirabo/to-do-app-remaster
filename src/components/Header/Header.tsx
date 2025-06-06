@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useTheme } from "../../themeContext";
+import { ThunkDispatch } from "redux-thunk";
+import { useDispatch } from "react-redux";
+import { AnyAction } from "redux";
+import { addTodo } from "../../actions/todoAction";
 
-interface HeaderProps {
-  handleAddItem: (name: string) => void;
-}
+export function Header() {
+  const dispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
 
-export function Header(props: HeaderProps) {
-  const { handleAddItem } = props;
   const [name, setName] = useState("");
 
   const context = useTheme();
@@ -15,7 +16,7 @@ export function Header(props: HeaderProps) {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      handleAddItem(name);
+      dispatch(addTodo(name, false));
       setName("");
     }
   };

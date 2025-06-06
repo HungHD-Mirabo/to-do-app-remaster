@@ -12,7 +12,10 @@ import {
   fetchItems,
   updateItem,
 } from "./apis/to-do.api";
-import { get } from "http";
+import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { addTodo, fetchTodos } from "./actions/todoAction";
 
 export interface Item {
   id: number;
@@ -34,82 +37,24 @@ export const filterOptions = [
 const data = new DataUtilities();
 
 function App() {
-  const [isLoading, setLoading] = useState(false);
-  const [items, setItems] = useState<Item[]>([]);
+  const dispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
 
-  const [filter, setFilter] = useState(filterOptions[0].value);
+  const { items, filter, isLoading } = useSelector((state: any) => state.todos);
 
   const context = useTheme();
   const { darkMode, toggleTheme } = context;
 
   useEffect(() => {
-    loadItems(0, filter);
+    dispatch(fetchTodos(0, filter));
   }, [filter]);
 
-  const loadItems = async (page = 0, filter = "all") => {
-    try {
-      setLoading(true);
-      const res = await fetchItems({ page, filter });
-      setItems(res.data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleFilterChange = (newFilter: string) => {
-    setFilter(newFilter);
-  };
-
-  const handleClearCompleted = async () => {
-    try {
-      setLoading(true);
-      await clearCompleted();
-      setItems((prevItems) => prevItems.filter((item) => !item.completed));
-    } catch (error) {
-      console.error("Error clearing completed items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddItem = async (name: string) => {
-    if (!name.trim()) return;
-    const newItem: ItemDto = { title: name, completed: false };
-    try {
-      await addItem(newItem);
-      loadItems(0, filter);
-    } catch (error) {
-      console.error("Error adding item:", error);
-    }
-  };
-
-  const handleCompleteItem = async (id: number) => {
-    try {
-      setLoading(true);
-      await completeItem(id);
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, completed: !item.completed } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error completing item:", error);
-    } finally {
-      setLoading(false);
-    }
+    dispatch({ type: "SET_FILTER", payload: newFilter });
   };
 
   const getMoreData = async (page: number) => {
     const res = await fetchItems({ page, filter });
     return res.data;
-  }
-
-  const handleLoadMore = (newData: Item[]) => {
-    console.log("hehe");
-    console.log("Loading more items:", newData);
-    setItems((prevItems) => [...prevItems, ...newData]);
   };
 
   console.log("theme", context.theme);
@@ -123,20 +68,9 @@ function App() {
           {darkMode ? "Light" : "Dark"}
         </button>
       </header>
-      <Header handleAddItem={handleAddItem} />
-      <Main
-        items={items}
-        filter={filter}
-        handleCompleteItem={handleCompleteItem}
-        handleLoadMore={handleLoadMore}
-        getMoreData={getMoreData}
-      />
-      <Footer
-        itemsLeft={items.filter((item) => !item.completed).length}
-        filter={filter}
-        handleClearCompleted={handleClearCompleted}
-        handleFilterChange={handleFilterChange}
-      />
+      <Header />
+      <Main getMoreData={getMoreData} />
+      <Footer />
       <footer>
         <p>Double-click to edit a todo</p>
         <p>Created by the TodoMVC Team</p>
@@ -147,4 +81,3 @@ function App() {
 }
 
 export default App;
-

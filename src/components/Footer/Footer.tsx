@@ -1,12 +1,14 @@
-interface FooterProps {
-  itemsLeft?: number;
-  filter?: string;
-  handleClearCompleted?: () => void;
-  handleFilterChange: (filter: string) => void;
-}
+import { useDispatch, useSelector } from "react-redux";
+import { AnyAction } from "redux";
+import { ThunkDispatch } from "redux-thunk";
+import { clearCompleted, setFilter } from "../../actions/todoAction";
 
-export function Footer(props: FooterProps) {
-  const { itemsLeft, filter, handleClearCompleted, handleFilterChange } = props;
+export function Footer() {
+  const dispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+
+  const { items, filter, isLoading } = useSelector((state: any) => state.todos);
+
+  const itemsLeft = items.filter((item: any) => !item.completed).length;
 
   return (
     <footer className="footer">
@@ -17,7 +19,7 @@ export function Footer(props: FooterProps) {
         <li>
           <span
             className={filter === "all" ? "selected" : ""}
-            onClick={() => handleFilterChange("all")}
+            onClick={() => dispatch(setFilter("all"))}
           >
             All
           </span>
@@ -25,7 +27,7 @@ export function Footer(props: FooterProps) {
         <li>
           <span
             className={filter === "active" ? "selected" : ""}
-            onClick={() => handleFilterChange("active")}
+            onClick={() => dispatch(setFilter("active"))}
           >
             Active
           </span>
@@ -33,13 +35,16 @@ export function Footer(props: FooterProps) {
         <li>
           <span
             className={filter === "completed" ? "selected" : ""}
-            onClick={() => handleFilterChange("completed")}
+            onClick={() => dispatch(setFilter("completed"))}
           >
             Completed
           </span>
         </li>
       </ul>
-      <button className="clear-completed" onClick={handleClearCompleted}>
+      <button
+        className="clear-completed"
+        onClick={() => dispatch(clearCompleted())}
+      >
         Clear completed
       </button>
     </footer>

@@ -6,23 +6,29 @@ import React, {
   ComponentType,
 } from "react";
 import { Item } from "./App";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { useDispatch, useSelector } from "react-redux";
+import { loadMoreTodos } from "./actions/todoAction";
 
 export interface WithScrollProps {
-  items: Item[];
   getData: (page: number) => Item[];
-  handleLoadMore: (newData: Item[]) => void;
 }
 
 const withScrollLoadMore = <P extends WithScrollProps>(
   WrappedComponent: ComponentType<P>
 ) => {
   return (props: P) => {
+    const dispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+
+    const { items } = useSelector((state: any) => state.todos);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
 
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const { items = [], getData, handleLoadMore } = props;
+    const { getData } = props;
 
     const loadMore = useCallback(() => {
       console.log("loadMore called");
@@ -46,15 +52,15 @@ const withScrollLoadMore = <P extends WithScrollProps>(
         }
 
         console.log("New data loaded:", newData);
-        console.log("handleLoadMore ", handleLoadMore);
+        console.log("handleLoadMore ", dispatch(loadMoreTodos(newData)));
 
-        handleLoadMore(newData);
+        dispatch(loadMoreTodos(newData));
         setLoading(false);
       } catch (error) {
         setLoading(false);
         setHasMore(false);
       }
-    }, [hasMore, loading, getData, handleLoadMore]);
+    }, [hasMore, loading, getData]);
 
     const handleScroll = useCallback(() => {
       console.log("handleScroll called");

@@ -1,3 +1,8 @@
+import { useDispatch } from "react-redux";
+import { AnyAction } from "redux";
+import { ThunkDispatch } from "redux-thunk";
+import { toggleTodo } from "../../actions/todoAction";
+
 interface ItemProps {
   item: {
     id: number;
@@ -5,18 +10,18 @@ interface ItemProps {
     completed: boolean;
   };
   index: number;
-  toggleItem: (id: number) => void;
 }
 
 export function ItemResult(props: ItemProps) {
-  const { item, index, toggleItem } = props;
+  const dispatch: ThunkDispatch<any, any, AnyAction> = useDispatch();
+  const { item, index } = props;
 
   return (
     <li className="todo-item" key={index}>
       <input
         type="checkbox"
         checked={item.completed}
-        onClick={() => toggleItem(item.id)}
+        onClick={() => dispatch(toggleTodo(item.id))}
       />
       <div className={item.completed ? "completed" : ""}>{item.title}</div>
     </li>
