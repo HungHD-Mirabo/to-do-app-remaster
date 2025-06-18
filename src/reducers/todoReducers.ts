@@ -8,17 +8,17 @@ const initialState = {
 
 export const todoReducer = (state = initialState, action: any) => {
   switch (action.type) {
-    case "FETCH_TODOS":
+    case 'FETCH_TODOS_SUCCESS':
       return {
         ...state,
         todos: action.payload,
       };
-    case "ADD_TODO":
+    case 'ADD_TODO_SUCCESS':
       return {
         ...state,
         todos: [...state.todos, action.payload],
       };
-    case "TOGGLE_TODO":
+    case 'TOGGLE_TODO_SUCCESS':
       return {
         ...state,
         todos: state.todos.map((todo) =>
@@ -27,7 +27,7 @@ export const todoReducer = (state = initialState, action: any) => {
             : todo
         ),
       };
-    case "CLEAR_COMPLETED":
+    case 'CLEAR_COMPLETED_SUCCESS':
       return {
         ...state,
         todos: state.todos.filter((todo) => !todo.completed),
